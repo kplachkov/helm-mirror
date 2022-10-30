@@ -99,11 +99,13 @@ func resolveFormatter(output string, l *log.Logger) (formatter.Formatter, error)
 	if len(a) > 1 {
 		imagesFile = a[1]
 	}
+
 	imagesFile, err := filepath.Abs(imagesFile)
 	if err != nil {
-		l.Print("error: geting working directory")
+		l.Print("error: getting working directory")
 		return nil, err
 	}
+
 	var t formatter.Type
 	switch a[0] {
 	case "file":
@@ -122,14 +124,12 @@ func resolveFormatter(output string, l *log.Logger) (formatter.Formatter, error)
 
 func runInspectImages(cmd *cobra.Command, args []string) error {
 	target = args[0]
-	formatter, err := resolveFormatter(output, logger)
+	fmt, err := resolveFormatter(output, logger)
 	if err != nil {
 		return err
 	}
-	imagesService := service.NewImagesService(target, Verbose, IgnoreErrors, formatter, logger)
+
+	imagesService := service.NewImagesService(target, Verbose, IgnoreErrors, fmt, logger)
 	err = imagesService.Images()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

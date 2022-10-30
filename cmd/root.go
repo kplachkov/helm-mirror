@@ -23,22 +23,22 @@ import (
 	"path"
 	"strings"
 
-	"github.com/openSUSE/helm-mirror/service"
 	"github.com/spf13/cobra"
-	"k8s.io/helm/pkg/repo"
+	"helm.sh/helm/v3/pkg/repo"
+
+	"github.com/openSUSE/helm-mirror/service"
 )
 
 var (
-	//Verbose defines if the command is being run with verbose mode
+	// Verbose defines if the command is being run with verbose mode
 	Verbose bool
-	//IgnoreErrors ignores errors in processing charts
+	// IgnoreErrors ignores errors in processing charts
 	IgnoreErrors bool
-	//AllVersions gets all the versions of the charts when true, false by default
+	// AllVersions gets all the versions of the charts when true, false by default
 	AllVersions  bool
 	chartName    string
 	chartVersion string
 	folder       string
-	repoURL      *url.URL
 	flags        = log.Ldate | log.Lmicroseconds | log.Lshortfile
 	prefix       = "helm-mirror: "
 	logger       *log.Logger
@@ -130,14 +130,15 @@ func validateRootArgs(cmd *cobra.Command, args []string) error {
 		logger.Printf("error: requires at least two args to execute")
 		return errors.New("error: requires at least two args to execute")
 	}
-	url, err := url.Parse(args[0])
+
+	repoURL, err := url.Parse(args[0])
 	if err != nil {
 		logger.Printf("error: not a valid URL for index file: %s", err)
 		return err
 	}
 
-	if !strings.Contains(url.Scheme, "http") {
-		logger.Printf("error: not a valid URL protocol: `%s`", url.Scheme)
+	if !strings.Contains(repoURL.Scheme, "http") {
+		logger.Printf("error: not a valid URL protocol: `%s`", repoURL.Scheme)
 		return errors.New("error: not a valid URL protocol")
 	}
 	if !path.IsAbs(args[1]) {
@@ -153,6 +154,7 @@ func runRoot(cmd *cobra.Command, args []string) error {
 		logger.Printf("error: not a valid URL for index file: %s", err)
 		return err
 	}
+
 	folder = args[1]
 	err = os.MkdirAll(folder, 0744)
 	if err != nil {
@@ -188,10 +190,8 @@ func runRoot(cmd *cobra.Command, args []string) error {
 		CertFile: certFile,
 		KeyFile:  keyFile,
 	}
+
 	getService := service.NewGetService(config, AllVersions, Verbose, IgnoreErrors, logger, rootURL.String(), chartName, chartVersion)
 	err = getService.Get()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

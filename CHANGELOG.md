@@ -5,14 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## v0.4.0
+
+- Add Helm 3 support
+- Update all dependencies
 
 ## v0.3.1
 
 - Update to use go modules
-- Update to use hel 2.16.1 to fix CVE-2019-18658
-
-bsc#1156646
+- Update to use helm 2.16.1 to fix CVE-2019-18658
 
 ## v0.3.0
 
@@ -76,5 +77,3 @@ bsc#1156646
   - --username
 
 - CI steps with [Travis CI](https://travis-ci.org) and Code Coverage with [CodeCov](https://codecov.io)
-
-[Unreleased]: https://github.com/openSUSE/helm-mirror/compare/v0.1.0...HEAD
