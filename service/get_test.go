@@ -1,7 +1,6 @@
 package service
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -9,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/openSUSE/helm-mirror/fixtures"
+	"helm.sh/helm/v3/pkg/repo"
 
-	"k8s.io/helm/pkg/repo"
+	"github.com/openSUSE/helm-mirror/fixtures"
 )
 
 var fakeLogger = log.New(&mockLog{}, "test:", log.LstdFlags)
@@ -23,7 +22,7 @@ func (m *mockLog) Write(p []byte) (n int, err error) {
 }
 
 func TestNewGetService(t *testing.T) {
-	dir, err := ioutil.TempDir("", "helmmirrortests")
+	dir, err := os.MkdirTemp("", "helmmirrortests")
 	if err != nil {
 		t.Errorf("Creating tmp directory: %s", err)
 	}
@@ -83,18 +82,17 @@ func TestGetService_Get(t *testing.T) {
 	}{
 		{"1", fields{"", "", false, false, true, "", ""}, true, 0},
 		{"2", fields{"http://127.0.0.1", "", false, false, true, "", ""}, true, 0},
-		{"3", fields{"http://127.0.0.1:1793", "", false, false, true, "", ""}, true, 0},
-		{"4", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), false, false, true, "", ""}, true, 0},
-		{"5", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, false, true, "", ""}, false, 4},
-		{"6", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, false, false, "", ""}, false, 3},
-		{"7", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "", ""}, false, 3},
-		{"8", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart2", ""}, false, 1},
-		{"9", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart", ""}, false, 0},
-		{"10", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, `^(?:(?:aa)|.$`, ""}, true, 0},
-		{"11", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart2", "7.0.0"}, false, 0},
-		{"12", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart2", "0.0.0-rc1"}, false, 1},
-		{"13", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, true, "chart2", ""}, false, 2},
-		{"14", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, true, "chart2", "0.0.0-rc1"}, false, 1},
+		{"3", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), false, false, true, "", ""}, true, 0},
+		{"4", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, false, true, "", ""}, false, 4},
+		{"5", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, false, false, "", ""}, false, 3},
+		{"6", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "", ""}, false, 3},
+		{"7", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart2", ""}, false, 1},
+		{"8", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart", ""}, false, 0},
+		{"9", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, `^(?:(?:aa)|.$`, ""}, true, 0},
+		{"10", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart2", "7.0.0"}, false, 0},
+		{"11", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, false, "chart2", "0.0.0-rc1"}, false, 1},
+		{"12", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, true, "chart2", ""}, false, 2},
+		{"13", fields{"http://127.0.0.1:1793", path.Join(dir, "get"), true, true, true, "chart2", "0.0.0-rc1"}, false, 1},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -111,7 +109,7 @@ func TestGetService_Get(t *testing.T) {
 				t.Errorf("GetService.Get() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
-				files, err := ioutil.ReadDir(path.Join(dir, "get"))
+				files, err := os.ReadDir(path.Join(dir, "get"))
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -128,7 +126,6 @@ func TestGetService_Get(t *testing.T) {
 			}
 		})
 	}
-	os.RemoveAll("downloaded-index.yaml")
 }
 
 func Test_writeFile(t *testing.T) {
@@ -149,7 +146,12 @@ func Test_writeFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := writeFile(tt.args.name, tt.args.content, tt.args.log, tt.args.ignoreErrors); (err != nil) != tt.wantErr {
+			svc := GetService{
+				ignoreErrors: tt.args.ignoreErrors,
+				logger:       tt.args.log,
+			}
+
+			if err := svc.writeFile(tt.args.name, tt.args.content); (err != nil) != tt.wantErr {
 				t.Errorf("writeFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -180,24 +182,37 @@ func Test_prepareIndexFile(t *testing.T) {
 		{"3", args{path.Join(dir, "processfolder"), "http://127.0.0.1:1793", "", fakeLogger, false}, false},
 	}
 	for _, tt := range tests {
-		ioutil.WriteFile(path.Join(dir, "processfolder", "downloaded-index.yaml"), []byte(fixtures.IndexYaml), 0666)
+		svc := GetService{
+			config: repo.Entry{
+				Name: tt.args.folder,
+				URL:  tt.args.URL,
+			},
+			ignoreErrors:  tt.args.ignoreErrors,
+			logger:        tt.args.log,
+			newRootURL:    tt.args.newRootURL,
+			indexFilePath: path.Join(tt.args.folder, indexFileName),
+		}
+
+		err = os.WriteFile(path.Join(dir, "processfolder", indexFileName), []byte(fixtures.IndexYaml), 0666)
+		if err != nil {
+			t.Errorf("os.WriteFile() error = %v", err)
+		}
+
 		t.Run(tt.name, func(t *testing.T) {
-			if err := prepareIndexFile(tt.args.folder, tt.args.URL, tt.args.newRootURL, tt.args.log, tt.args.ignoreErrors); (err != nil) != tt.wantErr {
+			if err := svc.prepareIndexFile(); (err != nil) != tt.wantErr {
 				t.Errorf("prepareIndexFile() error = %v, wantErr %v", err, tt.wantErr)
 			}
+
 			if tt.name == "1" {
-				contentBytes, err := ioutil.ReadFile(path.Join(dir, "processfolder", "index.yaml"))
+				contentBytes, err := os.ReadFile(path.Join(tt.args.folder, indexFileName))
 				if err != nil {
 					t.Log("Error reading index.yaml")
 				}
+
 				content := string(contentBytes)
 				count := strings.Count(content, tt.args.newRootURL)
 				if count != fixtures.Expectedcharts {
 					t.Errorf("prepareIndexFile() replacedCount = %v, want replacedCount %v", count, fixtures.Expectedcharts)
-				}
-				_, err = os.Stat(path.Join(dir, "processfolder", "downloaded-index.yaml"))
-				if err == nil {
-					t.Errorf("prepareIndexFile() dowloaded-index.yaml not deleted")
 				}
 			}
 		})

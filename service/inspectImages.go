@@ -10,13 +10,12 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/openSUSE/helm-mirror/formatter"
 	"github.com/pkg/errors"
-	"k8s.io/helm/pkg/chartutil"
-	"k8s.io/helm/pkg/engine"
-	"k8s.io/helm/pkg/proto/hapi/chart"
-	"k8s.io/helm/pkg/renderutil"
-	tversion "k8s.io/helm/pkg/version"
+	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/engine"
+
+	"github.com/openSUSE/helm-mirror/formatter"
 )
 
 // ImagesServiceInterface defines a Get service
@@ -35,7 +34,7 @@ type ImagesService struct {
 	buffer         bytes.Buffer
 }
 
-// NewImagesService return a new instace of ImagesService
+// NewImagesService return a new instance of ImagesService
 func NewImagesService(target string, verbose bool, ignoreErrors bool, formatter formatter.Formatter, logger *log.Logger) ImagesServiceInterface {
 	return &ImagesService{
 		target:       target,
@@ -46,7 +45,7 @@ func NewImagesService(target string, verbose bool, ignoreErrors bool, formatter 
 	}
 }
 
-//Images extracts al the images in the Helm Charts downloaded by the get command
+// Images extracts al the images in the Helm Charts downloaded by the get command
 func (i *ImagesService) Images() error {
 	fi, err := os.Stat(i.target)
 	if err != nil {
@@ -60,7 +59,7 @@ func (i *ImagesService) Images() error {
 		err = i.processTarget(i.target)
 	}
 	if err != nil {
-		i.logger.Printf("error: procesing target %s: %s", i.target, err)
+		i.logger.Printf("error: processing target %s: %s", i.target, err)
 		return err
 	}
 	err = i.formatter.Output(i.buffer)
@@ -114,33 +113,37 @@ func (i *ImagesService) processDirectory(target string) error {
 
 func (i *ImagesService) processTarget(target string) error {
 	if i.verbose {
-		i.logger.Printf("processig target: %s", target)
+		i.logger.Printf("processing target: %s", target)
 	}
 
-	c, err := chartutil.Load(target)
+	cht, err := loader.Load(target)
 	if err != nil {
 		return err
 	}
-	caps := &chartutil.Capabilities{
-		APIVersions:   chartutil.DefaultVersionSet,
-		KubeVersion:   chartutil.DefaultKubeVersion,
-		TillerVersion: tversion.GetVersionProto(),
-	}
-	chartConfig := &chart.Config{}
-	vals, err := chartutil.ToRenderValuesCaps(c, chartConfig, renderutil.Options{}.ReleaseOptions, caps)
+
+	vals, err := chartutil.ToRenderValues(
+		cht,
+		nil,
+		chartutil.ReleaseOptions{},
+		chartutil.DefaultCapabilities,
+	)
 	if err != nil {
 		i.logger.Printf("error: cannot render values: %s", err)
 		return err
 	}
 
 	vals = cleanUp(vals)
-	renderer := engine.New()
-	renderer.LintMode = i.ignoreErrors
-	rendered, err := renderer.Render(c, vals)
+
+	renderer := engine.Engine{
+		LintMode: i.ignoreErrors,
+	}
+
+	rendered, err := renderer.Render(cht, vals)
 	if err != nil {
 		i.logger.Printf("error: cannot render chart: %s", err)
 		return err
 	}
+
 	for _, t := range rendered {
 		scanner := bufio.NewScanner(strings.NewReader(t))
 		for scanner.Scan() {

@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"testing"
 
-	"github.com/openSUSE/helm-mirror/fixtures"
 	"github.com/spf13/cobra"
+
+	"github.com/openSUSE/helm-mirror/fixtures"
 )
 
 func Test_validateRootArgs(t *testing.T) {
@@ -48,7 +48,7 @@ func Test_validateRootArgs(t *testing.T) {
 }
 
 func Test_runRoot(t *testing.T) {
-	dir, err := ioutil.TempDir("", "helmmirror")
+	dir, err := os.MkdirTemp("", "helmmirror")
 	if err != nil {
 		t.Errorf("creating temp dir: %s", err)
 	}

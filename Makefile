@@ -110,15 +110,12 @@ mirrorimage:
 test.unit: mirrorimage
 	$(DOCKER_RUN) $(MIRROR_IMAGE) make test
 
-test: local-validate-go
+test:
 	rm -rf /tmp/mirror
 	$(GO) test -v ./...
 
 cover:
 	bash <scripts/cover.sh
-
-bootstrap:
-	dep ensure
 
 dist: export COPYFILE_DISABLE=1 #teach OSX tar to not put ._* files in tar archive
 dist:
@@ -149,6 +146,11 @@ doc/man/%.1: doc/man/%.1.md
 	$(GO_MD2MAN) -in $< -out $@
 
 doc: $(MANPAGES)
+
+update-deps:
+	go get -u
+	go mod tidy
+	go mod vendor
 
 .PHONY: mirror \
 	mirror.static \

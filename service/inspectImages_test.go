@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -125,7 +124,9 @@ func TestImagesService_processTarget(t *testing.T) {
 	if err != nil {
 		t.Errorf("loading testdata: %s", err)
 	}
+
 	defer os.RemoveAll(dir)
+
 	processTgzPath := path.Join(dir, "processtgz")
 	tests := []struct {
 		name    string
@@ -156,6 +157,7 @@ func TestImagesService_processTarget(t *testing.T) {
 			if err := i.processTarget(tt.target); (err != nil) != tt.wantErr {
 				t.Errorf("ImagesService.processTgz() error = %v, wantErr %v", err, tt.wantErr)
 			}
+
 			got := i.buffer.String()
 			if tt.wantBuf != got {
 				t.Errorf("ImagesService.processTgz() buffer = %v, wantBuf %v", got, tt.wantBuf)
@@ -195,19 +197,22 @@ func Test_sanitizeImageString(t *testing.T) {
 }
 
 func prepareTmp() (string, error) {
-	dir, err := ioutil.TempDir("", "helmmirror")
+	dir, err := os.MkdirTemp("", "helmmirror")
 	if err != nil {
 		return "", err
 	}
+
 	testdataPath := path.Join(dir, "testdata")
 	processPath := path.Join(dir, "processfolder")
 	processTgzPath := path.Join(dir, "processtgz")
 	errorPath := path.Join(dir, "processfoldererror")
 	getPath := path.Join(dir, "get")
+
 	os.MkdirAll(processPath, 0777)
 	os.MkdirAll(processTgzPath, 0777)
 	os.MkdirAll(errorPath, 0777)
 	os.MkdirAll(getPath, 0777)
+
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -217,6 +222,7 @@ func prepareTmp() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	tarCmd := exec.Command("tar", "zcvf", path.Join(processTgzPath, "chart1.tgz"), "--directory="+testdataPath, "chart1")
 	tarCmd.Run()
 	tarCmd = exec.Command("tar", "zcvf", path.Join(processTgzPath, "chart2.tgz"), "--directory="+testdataPath, "chart2")
@@ -234,13 +240,16 @@ func prepareTmp() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	err = os.Symlink(path.Join(processTgzPath, "chart2.tgz"), path.Join(processPath, "chart2.tgz"))
 	if err != nil {
 		return "", err
 	}
+
 	err = os.Symlink(path.Join(processTgzPath, "chart1.tgz"), path.Join(errorPath, "chart1.tgz"))
 	if err != nil {
 		return "", err
 	}
+
 	return dir, err
 }

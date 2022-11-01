@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/containers/image/types"
-	"github.com/docker/distribution/reference"
+	"github.com/containers/image/v5/types"
+	"github.com/distribution/distribution/v3/reference"
 	yamlencoder "gopkg.in/yaml.v3"
 )
 
@@ -68,7 +68,7 @@ func (f *skopeo) Output(b bytes.Buffer) error {
 	return nil
 }
 
-//TODO use Skopeo's source code structures
+// TODO use Skopeo's source code structures
 
 // Registry definition of a registry to be used by Skopeo
 type Registry struct {
