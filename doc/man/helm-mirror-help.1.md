@@ -1,6 +1,4 @@
 % helm-mirror-help(1) # helm-mirror help - Displays the usage statement
-% SUSE LLC
-% OCTOBER 2018
 # NAME
 helm-mirror help - Displays the usage statement
 

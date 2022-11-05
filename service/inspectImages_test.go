@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/openSUSE/helm-mirror/formatter"
+	"github.com/kplachkov/helm-mirror/formatter"
 )
 
 var (

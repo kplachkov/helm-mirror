@@ -59,10 +59,10 @@ func chartTgz(w http.ResponseWriter, r *http.Request) {
 var chartTGZ = []byte{31, 139, 8, 0, 224, 223, 181, 91, 0, 3, 237, 193, 1, 13, 0, 0, 0, 194,
 	160, 247, 79, 109, 14, 55, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 55, 3, 154, 222, 29, 39, 0, 40, 0, 0}
 
-//Expectedcharts How many charts are in the test file
+// Expectedcharts How many charts are in the test file
 var Expectedcharts = 5
 
-//IndexYaml test index file
+// IndexYaml test index file
 var IndexYaml = `apiVersion: v1
 entries:
   chart1:

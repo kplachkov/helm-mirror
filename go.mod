@@ -1,10 +1,10 @@
-module github.com/openSUSE/helm-mirror
+module github.com/kplachkov/helm-mirror
 
 go 1.19
 
 require (
 	github.com/containers/image/v5 v5.23.0
-	github.com/distribution/distribution/v3 v3.0.0-20221028072015-7f9f86c4116f
+	github.com/distribution/distribution/v3 v3.0.0-20221104155641-e3509fc1deed
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.6.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -68,7 +68,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
-	github.com/prometheus/client_golang v1.13.0 // indirect
+	github.com/prometheus/client_golang v1.13.1 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
@@ -102,7 +102,7 @@ require (
 	k8s.io/client-go v0.25.3 // indirect
 	k8s.io/klog/v2 v2.80.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20221012153701-172d655c2280 // indirect
-	k8s.io/utils v0.0.0-20221012122500-cfd413dd9e85 // indirect
+	k8s.io/utils v0.0.0-20221101230645-61b03e2f6476 // indirect
 	oras.land/oras-go v1.2.1 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 	sigs.k8s.io/kustomize/api v0.12.1 // indirect

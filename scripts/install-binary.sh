@@ -3,7 +3,7 @@
 # Shamelessly copied from https://github.com/databus23/helm-diff
 
 PROJECT_NAME="helm-mirror"
-PROJECT_GH="openSUSE/$PROJECT_NAME"
+PROJECT_GH="kplachkov/$PROJECT_NAME"
 export GREP_COLOR="never"
 
 # Convert HELM_BIN and HELM_PLUGIN_DIR to unix if cygpath is
