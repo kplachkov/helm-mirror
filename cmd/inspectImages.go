@@ -1,17 +1,3 @@
-// Copyright © 2018 openSUSE opensuse-project@opensuse.org
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
@@ -21,9 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/openSUSE/helm-mirror/formatter"
-	"github.com/openSUSE/helm-mirror/service"
 	"github.com/spf13/cobra"
+
+	"github.com/kplachkov/helm-mirror/formatter"
+	"github.com/kplachkov/helm-mirror/service"
 )
 
 var (
@@ -50,8 +37,6 @@ Options:
 - json: outputs all images to a file in JSON format
 - skopeo: outputs all images to a file in YAML format
   to be used as source file with the 'skopeo sync' command.
-  For more information refer to the 'skopeo sync'
-  documentation at https://github.com/SUSE/skopeo/blob/sync/docs/skopeo.1.md#skopeo-sync
 - stdout: prints all images to standard output
 - yaml: outputs all images to a file in YAML format
 
@@ -76,7 +61,6 @@ var inspectImagesCmd = &cobra.Command{
 }
 
 func init() {
-
 	inspectImagesCmd.PersistentFlags().StringVarP(&output, "output", "o", "stdout", outputDesc)
 	rootCmd.AddCommand(inspectImagesCmd)
 }

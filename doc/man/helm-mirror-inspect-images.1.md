@@ -1,6 +1,4 @@
 % helm-mirror-inspect-images(1) # helm-mirror inspect-images - Extract all the container images listed in each chart.
-% SUSE LLC
-% OCTOBER 2018
 # NAME
 helm-mirror inspect-images - Extract all the container images listed in each chart.
 
@@ -32,7 +30,7 @@ option.
 
 **-o, --output**
   choose an output for the list of images and specify the file name, if not specified 'images.out' will be the default.
-  (file|json|skopeo[1]|**stdout**|yaml)
+  (file|json|skopeo|**stdout**|yaml)
 
 # EXAMPLES
 The following examples show different ways to interact with **mirror inspect-images**
@@ -65,5 +63,3 @@ errors are usually for missing required values in the charts.
 **helm-mirror**(1),
 **helm-mirror-help**(1),
 **helm-mirror-version**(1)
-
-[1]: https://github.com/SUSE/skopeo/blob/sync/docs/skopeo.1.md#skopeo-sync

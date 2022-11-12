@@ -3,7 +3,7 @@ GO ?= go
 GO_MD2MAN ?= go-md2man
 
 # Paths.
-PROJECT := github.com/openSUSE/helm-mirror
+PROJECT := github.com/kplachkov/helm-mirror
 CMD := .
 HELM_HOME_MIRROR := $(HELM_HOME)/plugins/helm-mirror
 HELM_HOME_MIRROR_BIN := $(HELM_HOME_MIRROR)/bin
@@ -22,9 +22,6 @@ GPG_KEYID ?=
 VERSION := $(shell sed -n -e 's/version:[ "]*\([^"]*\).*/\1/p' plugin.yaml)
 COMMIT_NO := $(shell git rev-parse HEAD 2> /dev/null || true)
 COMMIT := $(if $(shell git status --porcelain --untracked-files=no),"${COMMIT_NO}-dirty","${COMMIT_NO}")
-
-# Get current Version changelog
-CHANGE := $(shell sed -e '1,/v$(VERSION)/d;/v.*/Q' ./CHANGELOG.md)
 
 BUILD_FLAGS ?=
 
@@ -100,9 +97,6 @@ local-validate-build:
 	env CGO_ENABLED=0 $(GO) build ${STATIC_BUILD_FLAGS} -o /dev/null ${CMD}
 	$(GO) test -run nothing ${DYN_BUILD_FLAGS} $(PROJECT)/...
 
-# Used for tests.
-DOCKER_IMAGE :=opensuse/amd64:tumbleweed
-
 mirrorimage:
 	docker build -t $(MIRROR_IMAGE) .
 
@@ -129,15 +123,6 @@ dist:
 	rm build/mirror/bin/helm-mirror
 	GOOS=windows GOARCH=amd64 go build -o build/mirror/bin/helm-mirror.exe -ldflags="$(BASE_LDFLAGS)"
 	tar -C build/ -zcvf $(CURDIR)/release/helm-mirror-windows.tgz mirror/
-
-release: dist
-ifndef GITHUB_TOKEN
-	$(error GITHUB_TOKEN is undefined)
-endif
-	github-release release -u openSUSE -r helm-mirror --tag v$(VERSION)  --name v$(VERSION) -s $(GITHUB_TOKEN) -d "$(CHANGE)"
-	github-release upload -u openSUSE -r helm-mirror --tag v$(VERSION)  --name helm-mirror-linux.tgz --file release/helm-mirror-linux.tgz -s $(GITHUB_TOKEN)
-	github-release upload -u openSUSE -r helm-mirror --tag v$(VERSION)  --name helm-mirror-macos.tgz --file release/helm-mirror-macos.tgz -s $(GITHUB_TOKEN)
-	github-release upload -u openSUSE -r helm-mirror --tag v$(VERSION)  --name helm-mirror-windows.tgz --file release/helm-mirror-windows.tgz -s $(GITHUB_TOKEN)
 
 MANPAGES_MD := $(wildcard doc/man/*.md)
 MANPAGES    := $(MANPAGES_MD:%.md=%)

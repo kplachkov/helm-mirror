@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/openSUSE/helm-mirror/formatter"
+	"github.com/kplachkov/helm-mirror/formatter"
 )
 
 func Test_validateInspectImagesArgs(t *testing.T) {

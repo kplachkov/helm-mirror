@@ -10,7 +10,7 @@ import (
 
 	"helm.sh/helm/v3/pkg/repo"
 
-	"github.com/openSUSE/helm-mirror/fixtures"
+	"github.com/kplachkov/helm-mirror/fixtures"
 )
 
 var fakeLogger = log.New(&mockLog{}, "test:", log.LstdFlags)

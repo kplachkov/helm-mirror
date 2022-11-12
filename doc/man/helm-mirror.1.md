@@ -1,6 +1,4 @@
 % helm-mirror(1) # helm-mirror - Mirror chart repositories
-% SUSE LLC
-% OCTOBER 2018
 # NAME
 helm-mirror - helm-mirror chart repositories
 

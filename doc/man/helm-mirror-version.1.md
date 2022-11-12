@@ -1,6 +1,4 @@
 % helm-mirror-version(1) # Version - show program current version
-% SUSE LLC
-% OCTOBER 2018
 # NAME
 helm-mirror version - show program current version
 

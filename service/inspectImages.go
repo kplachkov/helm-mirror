@@ -15,7 +15,7 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/engine"
 
-	"github.com/openSUSE/helm-mirror/formatter"
+	"github.com/kplachkov/helm-mirror/formatter"
 )
 
 // ImagesServiceInterface defines a Get service

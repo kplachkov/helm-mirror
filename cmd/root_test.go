@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/openSUSE/helm-mirror/fixtures"
+	"github.com/kplachkov/helm-mirror/fixtures"
 )
 
 func Test_validateRootArgs(t *testing.T) {

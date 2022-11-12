@@ -1,12 +1,5 @@
 .idea
-helm-mirror
-mirror
-log-*
-images
 .vscode
+
 /bin
-/release
-/build
-cover.out
 coverage.txt
-sync.yaml
